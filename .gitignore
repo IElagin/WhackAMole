@@ -1,0 +1,16 @@
+# Мусор операционных систем
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Локальные настройки IDE — на любой глубине
+.idea/
+.vscode/
+
+# Локальные сборки: в репозитории только описание папки
+/WhackAMole.Build/*
+!/WhackAMole.Build/README.md
+
+# Ключи подписи никогда не попадают в репозиторий
+/WhackAMole.Keystore/*
+!/WhackAMole.Keystore/README.md
