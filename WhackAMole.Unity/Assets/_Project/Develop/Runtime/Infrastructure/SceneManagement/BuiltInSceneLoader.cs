@@ -14,7 +14,7 @@ namespace _Project.Develop.Runtime.Infrastructure.SceneManagement
         {
             if (_isLoading)
             {
-                Debug.LogWarning($"Сцена '{sceneKey}' не загружена: другая загрузка ещё идёт");
+                Debug.LogWarning($"Scene '{sceneKey}' is not loaded: another scene load is in progress.");
                 return;
             }
 
@@ -25,7 +25,7 @@ namespace _Project.Develop.Runtime.Infrastructure.SceneManagement
         {
             if (_isLoading)
             {
-                Debug.LogWarning($"Сцена '{sceneKey}' не загружена: другая загрузка ещё идёт");
+                Debug.LogWarning($"Scene '{sceneKey}' is not loaded: another scene load is in progress.");
                 return;
             }
 
@@ -45,7 +45,7 @@ namespace _Project.Develop.Runtime.Infrastructure.SceneManagement
                 extraRegistrations?.Dispose();
                 _isLoading = false;
 
-                throw new InvalidOperationException($"Не удалось начать загрузку сцены '{sceneKey}': проверьте имя и Build Profiles");
+                throw new InvalidOperationException($"Failed to start loading scene '{sceneKey}'. Ensure the scene is added to Build Profiles.");
             }
 
             operation.completed += _ =>
