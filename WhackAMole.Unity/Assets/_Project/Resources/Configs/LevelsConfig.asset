@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c47637a2583451da658f0a5b5d2e62, type: 3}
+  m_Name: LevelsConfig
+  m_EditorClassIdentifier: _Project.Runtime::_Project.Develop.Runtime.Gameplay.Levels.LevelsConfig
+  _levels:
+  - {fileID: 11400000, guid: 48be0de8800d64bd4a82ad3c9b665994, type: 2}
+  - {fileID: 11400000, guid: 9cefa2c4de9b740f7a8d9e082e9267dd, type: 2}
+  - {fileID: 11400000, guid: f273eb2cd48eb416caadba709470ee44, type: 2}
+  - {fileID: 11400000, guid: 966af71cfec3a44858600528d0785d57, type: 2}
+  - {fileID: 11400000, guid: a36a30f22a59f4248aebcc866182c4c3, type: 2}
