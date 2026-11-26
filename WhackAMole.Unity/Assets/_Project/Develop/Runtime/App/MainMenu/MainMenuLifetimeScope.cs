@@ -1,3 +1,6 @@
+using _Project.Develop.Runtime.App.MainMenu.StartupSteps;
+using _Project.Develop.Runtime.Infrastructure.Flow;
+using _Project.Develop.Runtime.Infrastructure.SceneTransitions;
 using VContainer;
 using VContainer.Unity;
 
@@ -10,8 +13,12 @@ namespace _Project.Develop.Runtime.App.MainMenu
             builder.Register<LevelSelector>(Lifetime.Singleton);
             builder.Register<MainMenuScreen>(Lifetime.Singleton);
 
-            builder.RegisterEntryPoint<MainMenuBootstrap>();
-            builder.RegisterEntryPoint<MainMenuInput>();
+            builder.Register<ISceneBootstrap, MainMenuBootstrap>(Lifetime.Singleton);
+            builder.Register<MainMenuStartupSteps>(Lifetime.Singleton);
+            builder.Register<FlowStepsFactory>(Lifetime.Singleton);
+            builder.Register<PrepareMainMenuStep>(Lifetime.Transient);
+
+            builder.RegisterEntryPoint<MainMenuInput>().AsSelf();
         }
     }
 }

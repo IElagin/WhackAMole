@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -18,25 +20,27 @@ namespace _Project.Develop.Runtime.Gameplay.Moles
             _resolver = resolver;
         }
 
+        public async UniTask LoadPrefabAsync(IProgress<float> progress, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            ResourceRequest request = Resources.LoadAsync<GameObject>(MOLE_PREFAB_PATH);
+            GameObject prefab = (GameObject)await request.ToUniTask(progress, cancellationToken: cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (prefab == null || !prefab.TryGetComponent(out Mole mole))
+                throw new InvalidOperationException($"В Resources по пути '{MOLE_PREFAB_PATH}' нет префаба с компонентом Mole");
+
+            _prefab = mole;
+            progress.Report(1f);
+        }
+
         public Mole Create(Transform hole, int holeNumber)
         {
-            if (_prefab == null)
-                _prefab = LoadPrefab();
-
             Mole mole = _resolver.Instantiate(_prefab, hole);
             mole.Setup(holeNumber);
 
             return mole;
-        }
-
-        private static Mole LoadPrefab()
-        {
-            Mole prefab = Resources.Load<Mole>(MOLE_PREFAB_PATH);
-
-            if (prefab == null)
-                throw new InvalidOperationException($"Префаб крота не найден в Resources по пути '{MOLE_PREFAB_PATH}'");
-
-            return prefab;
         }
     }
 }

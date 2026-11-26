@@ -1,25 +1,29 @@
-using _Project.Develop.Runtime.Gameplay.Moles;
+using System.Threading;
 using _Project.Develop.Runtime.Gameplay.Run;
-using VContainer.Unity;
+using _Project.Develop.Runtime.Infrastructure.Flow;
+using _Project.Develop.Runtime.Infrastructure.SceneTransitions;
+using Cysharp.Threading.Tasks;
 
 namespace _Project.Develop.Runtime.App.Gameplay
 {
-    // Пока переход синхронный, сцена запускает себя сама: когда переход научится ждать её готовности, запускать будет он
-    public sealed class GameplayBootstrap : IStartable
+    public sealed class GameplayBootstrap : ISceneBootstrap
     {
-        private readonly MoleField _moleField;
+        private const string FLOW_NAME = "Gameplay startup";
+
+        private readonly FlowRunner _runner;
+        private readonly GameplayStartupSteps _startupSteps;
         private readonly RunSession _runSession;
 
-        public GameplayBootstrap(MoleField moleField, RunSession runSession)
+        public GameplayBootstrap(FlowRunner runner, GameplayStartupSteps startupSteps, RunSession runSession)
         {
-            _moleField = moleField;
+            _runner = runner;
+            _startupSteps = startupSteps;
             _runSession = runSession;
         }
 
-        public void Start()
-        {
-            _moleField.Build();
-            _runSession.Start();
-        }
+        public UniTask InitializeAsync(IFlowProgress progress, CancellationToken cancellationToken) =>
+            _runner.RunAsync(FLOW_NAME, _startupSteps.Build(), progress, cancellationToken);
+
+        public void Run() => _runSession.Start();
     }
 }

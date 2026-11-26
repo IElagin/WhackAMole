@@ -8,6 +8,7 @@ namespace _Project.Develop.Runtime.App.MainMenu
     {
         private readonly WalletService _wallet;
         private readonly LevelSelector _levelSelector;
+        private string _status;
 
         public MainMenuScreen(WalletService wallet, LevelSelector levelSelector)
         {
@@ -15,7 +16,7 @@ namespace _Project.Develop.Runtime.App.MainMenu
             _levelSelector = levelSelector;
         }
 
-        public void ShowStatus()
+        public void PrepareStatus()
         {
             int levelCount = _levelSelector.LevelCount;
 
@@ -32,8 +33,10 @@ namespace _Project.Develop.Runtime.App.MainMenu
 
             builder.Append($"Клавиши 1…{levelCount} — выбрать уровень");
 
-            Debug.Log(builder.ToString());
+            _status = builder.ToString();
         }
+
+        public void ShowStatus() => Debug.Log(_status);
 
         public void ShowLevelLocked(int levelNumber)
         {

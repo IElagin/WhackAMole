@@ -7,7 +7,9 @@ using _Project.Develop.Runtime.Gameplay.Levels;
 using _Project.Develop.Runtime.Infrastructure.ApplicationStatus;
 using _Project.Develop.Runtime.Infrastructure.ConfigsService;
 using _Project.Develop.Runtime.Infrastructure.ConfigsService.ConfigLoader;
+using _Project.Develop.Runtime.Infrastructure.Flow;
 using _Project.Develop.Runtime.Infrastructure.SceneManagement;
+using _Project.Develop.Runtime.Infrastructure.SceneTransitions;
 using _Project.Develop.Runtime.Meta.Features.Economy;
 using _Project.Develop.Runtime.Meta.Features.Progress;
 using VContainer;
@@ -17,9 +19,12 @@ namespace _Project.Develop.Runtime.App.Root
 {
     public class RootLifetimeScope : LifetimeScope
     {
+        private const string BUFFER_SCENE_KEY = "Empty";
+
         protected override void Configure(IContainerBuilder builder)
         {
             InstallSceneLoading(builder);
+            InstallFlow(builder);
             InstallNavigation(builder);
             InstallConfigs(builder);
             InstallMeta(builder);
@@ -30,10 +35,18 @@ namespace _Project.Develop.Runtime.App.Root
         private void InstallSceneLoading(IContainerBuilder builder)
         {
             builder.Register<ISceneLoader, BuiltInSceneLoader>(Lifetime.Singleton);
+            builder.Register<ScenesService>(Lifetime.Singleton).WithParameter("bufferSceneKey", BUFFER_SCENE_KEY);
+        }
+
+        private void InstallFlow(IContainerBuilder builder)
+        {
+            builder.Register<FlowRunner>(Lifetime.Singleton);
+            builder.Register<FlowProgressLog>(Lifetime.Singleton);
         }
 
         private void InstallNavigation(IContainerBuilder builder)
         {
+            builder.Register<GameTransitionService>(Lifetime.Singleton);
             builder.Register<GameNavigation>(Lifetime.Singleton);
         }
 

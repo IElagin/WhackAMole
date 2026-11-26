@@ -18,13 +18,13 @@ namespace _Project.Develop.Runtime.Gameplay.Moles
             _moleFactory = moleFactory;
         }
 
-        public void Build()
+        public void AddHole(int rows, int columns)
         {
-            for (int i = 0; i < _holeGrid.Count; i++)
-            {
-                _moles.Add(_moleFactory.Create(_holeGrid.GetHole(i), i + 1));
-                _timers.Add(0f);
-            }
+            int index = _moles.Count;
+            Transform hole = _holeGrid.CreateHole(index, rows, columns);
+
+            _moles.Add(_moleFactory.Create(hole, index + 1));
+            _timers.Add(0f);
         }
 
         public bool TryShowInRandomFreeHole(float duration)

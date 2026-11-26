@@ -4,11 +4,13 @@ namespace _Project.Develop.Runtime.Gameplay
 {
     public sealed class GameplayConsole
     {
-        public void RunStarted(int level, int requiredHits, int lives)
+        public void RunStarted(int level, int requiredHits, int lives, int holeCount)
         {
+            string keys = holeCount == 1 ? "1" : $"1–{holeCount}";
+
             Debug.Log(
                 $"Уровень {level}: нужно попаданий {requiredHits}, жизней {lives}\n" +
-                "Клавиши 1–9 — лунки слева направо, сверху вниз");
+                $"Клавиши {keys} — лунки слева направо, сверху вниз");
         }
 
         public void MoleAppeared(int holeNumber)

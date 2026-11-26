@@ -1,6 +1,8 @@
+using _Project.Develop.Runtime.Infrastructure.SceneManagement;
+
 namespace _Project.Develop.Runtime.Gameplay
 {
-    public sealed class GameplayArgs
+    public sealed class GameplayArgs : IInputSceneArgs
     {
         public GameplayArgs(int levelNumber)
         {

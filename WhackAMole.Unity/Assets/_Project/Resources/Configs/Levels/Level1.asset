@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09fa6d4f3f4c74fbd9126a0fcf7410e8, type: 3}
   m_Name: Level1
   m_EditorClassIdentifier: _Project.Runtime::_Project.Develop.Runtime.Gameplay.Levels.LevelConfig
+  _rows: 2
+  _columns: 2
   _requiredHits: 5
   _lives: 3
   _spawnInterval: 1.5

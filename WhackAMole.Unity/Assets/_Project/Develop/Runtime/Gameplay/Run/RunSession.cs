@@ -32,7 +32,7 @@ namespace _Project.Develop.Runtime.Gameplay.Run
             Lives = config.Lives;
             State = RunState.Playing;
 
-            _console.RunStarted(_currentLevel.Number, config.RequiredHits, Lives);
+            _console.RunStarted(_currentLevel.Number, config.RequiredHits, Lives, config.Rows * config.Columns);
         }
 
         public void AddHit()

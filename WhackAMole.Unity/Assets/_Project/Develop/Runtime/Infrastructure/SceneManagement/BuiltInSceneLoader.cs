@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
@@ -6,53 +8,48 @@ using VContainer.Unity;
 
 namespace _Project.Develop.Runtime.Infrastructure.SceneManagement
 {
-    public sealed class BuiltInSceneLoader : ISceneLoader
+    public sealed class BuiltInSceneLoader : ISceneLoader, IDisposable
     {
-        private bool _isLoading;
+        private IDisposable _registrationsWindow;
 
-        public void Load(string sceneKey)
+        public async UniTask<Scene> LoadAsync(
+            string sceneKey,
+            CancellationToken cancellationToken,
+            Action<IContainerBuilder> extraRegistrations = null,
+            IProgress<float> progress = null)
         {
-            if (_isLoading)
-            {
-                Debug.LogWarning($"Scene '{sceneKey}' is not loaded: another scene load is in progress.");
-                return;
-            }
+            cancellationToken.ThrowIfCancellationRequested();
 
-            StartLoading(sceneKey, null);
+            // The target scope receives these registrations during Awake.
+            if (extraRegistrations != null)
+                _registrationsWindow = LifetimeScope.Enqueue(extraRegistrations);
+
+            try
+            {
+                AsyncOperation operation = SceneManager.LoadSceneAsync(sceneKey, LoadSceneMode.Additive);
+
+                if (operation == null)
+                    throw new InvalidOperationException($"Failed to start loading scene '{sceneKey}'.");
+
+                await operation.ToUniTask(progress, cancellationToken: cancellationToken);
+                return SceneManager.GetSceneByName(sceneKey);
+            }
+            finally
+            {
+                CloseRegistrationsWindow();
+            }
         }
 
-        public void Load<TArgs>(string sceneKey, TArgs args)
+        public UniTask UnloadAsync(Scene scene, CancellationToken cancellationToken) =>
+            SceneManager.UnloadSceneAsync(scene).ToUniTask(cancellationToken: cancellationToken);
+
+        // The root can be disposed while an async load is still pending.
+        public void Dispose() => CloseRegistrationsWindow();
+
+        private void CloseRegistrationsWindow()
         {
-            if (_isLoading)
-            {
-                Debug.LogWarning($"Scene '{sceneKey}' is not loaded: another scene load is in progress.");
-                return;
-            }
-
-            IDisposable extraRegistrations = LifetimeScope.Enqueue(builder => builder.RegisterInstance(args));
-
-            StartLoading(sceneKey, extraRegistrations);
-        }
-
-        private void StartLoading(string sceneKey, IDisposable extraRegistrations)
-        {
-            _isLoading = true;
-
-            AsyncOperation operation = SceneManager.LoadSceneAsync(sceneKey);
-
-            if (operation == null)
-            {
-                extraRegistrations?.Dispose();
-                _isLoading = false;
-
-                throw new InvalidOperationException($"Failed to start loading scene '{sceneKey}'. Ensure the scene is added to Build Profiles.");
-            }
-
-            operation.completed += _ =>
-            {
-                extraRegistrations?.Dispose();
-                _isLoading = false;
-            };
+            _registrationsWindow?.Dispose();
+            _registrationsWindow = null;
         }
     }
 }

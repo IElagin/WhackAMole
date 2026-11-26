@@ -4,31 +4,31 @@
 
 ## Игра
 
-ДЗ первой недели курса «Unity adventure professional»: «Бей крота» в консоли. Поле 3×3, лунки — клавиши 1–9 (слева направо, сверху вниз, верхний ряд цифр или numpad). Меню: клавиши 1…N выбирают уровень. После победы пробел — в меню; после поражения пробел — уровень заново, Esc — в меню. Весь вывод — в Console.
+«Бей крота» — ДЗ первых двух недель курса Unity Adventure Professional. Откройте проект `WhackAMole.Unity` в Unity 6000.6.0f1 и нажмите Play. При включённой настройке `Tools/WhackAMole/Play from Bootstrap` игра стартует через `Bootstrap` из любой открытой сцены. Включите отображение обычных сообщений в Unity Console. Для игры с клавиатуры выберите Game View.
+
+В меню цифры 1–5 выбирают открытый уровень. Во время забега цифры верхнего ряда или numpad ударяют по лункам. Нумерация идёт по строкам слева направо, от верхнего ряда к нижнему. На поле 2×2 верхний ряд — 1, 2, нижний — 3, 4. На поле 2×3 верхний ряд — 1, 2, 3, нижний — 4, 5, 6. На 3×3 доступны все девять клавиш.
+
+После победы нажмите пробел для возврата в меню. После поражения пробел перезапускает уровень, Esc возвращает в меню. Попадания, жизни и золото выводятся в Console.
 
 ## Сборки
 
-| asmdef | Ссылки | Что внутри |
+| asmdef | Основные зависимости | Назначение |
 |---|---|---|
-| `_Project.Infrastructure` | VContainer | фундамент: загрузка сцен (`ISceneLoader`), сервис конфигов, статус приложения. Об игре не знает. |
-| `_Project.Runtime` | Infrastructure, Utils, VContainer, Input System | `App` (скоупы, бутстрапы, навигация, ввод), `Gameplay` (кроты, забег, уровни), `Meta` (кошелёк, прогресс) |
-| `_Project.Utils` | — | общие утилиты (пока пусто) |
-| `_Project.Editor` | Infrastructure | `EntryPointSceneAutoLoader`: Play из любой сцены начинается с `Bootstrap` (меню `Tools/WhackAMole/Play from Bootstrap`) |
+| `_Project.Infrastructure` | VContainer, UniTask | Загрузка сцен и конфигов, выполнение шагов, прогресс, статус приложения |
+| `_Project.Runtime` | Infrastructure, Utils, VContainer, UniTask, Input System | Скоупы, бутстрапы, навигация, ввод, игровое поле, забег, кошелёк и прогресс |
+| `_Project.Utils` | — | Общие утилиты |
+| `_Project.Editor` | Infrastructure | Выбор стартовой сцены для Play |
 
-## Скоупы
+## Порядок запуска
 
-- **Root** (`RootLifetimeScope`-префаб в `VContainerSettings`, живёт всю игру): `ISceneLoader`, `GameNavigation`, `ConfigsProviderService` + `ResourcesConfigLoader`, `WalletService`, `PlayerProgressService`, `KeyboardInput`, статус приложения.
-- **Bootstrap**: `AppBootstrap` — 60 FPS, загрузка конфигов, стартовое золото, переход в меню.
-- **MainMenu**: `MainMenuBootstrap` (запуск сцены), `MainMenuScreen` (вывод), `LevelSelector` (открыт ли уровень, переход), `MainMenuInput`.
-- **Gameplay**: номер уровня приходит аргументом сцены (`LifetimeScope.Enqueue`, `GameplayArgs`). `GameplayBootstrap` (запуск сцены), `CurrentLevel`, `GameplayConsole`, `MoleFactory` (`IObjectResolver.Instantiate` префаба из `Resources/Gameplay/Mole`), `MoleField`, `MoleSpawner`, `WhackInput`, `RunSession`, `RunFinisher`, `RunEndInput`.
+1. Проектный `RootLifetimeScope` живёт между сценами. В нём зарегистрированы `GameTransitionService`, загрузчик сцен, сервисы конфигов, кошелёк и прогресс игрока.
+2. В `Bootstrap` точка входа `AppBootstrap` реализует `IAsyncStartable`. Загрузка конфигов и выдача стартового золота завершаются до перехода в меню.
+3. При переходе `ScenesService` загружает и активирует `Empty`, выгружает предыдущую сцену, загружает цель и выгружает буфер. Для Gameplay регистрация `GameplayArgs` действует на время загрузки сцены. Повторный запрос до завершения перехода пропускается.
+4. `FlowRunner` последовательно выполняет шаги из локального скоупа. После `ISceneBootstrap.InitializeAsync` переход вызывает `Run()`. Меню показывает подготовленный список уровней и включает ввод. Gameplay загружает префаб крота и создаёт по одной лунке за кадр, затем запускает забег. В Console видны этап, количество готовых лунок и процент сборки.
 
-Скоупы только регистрируют; сцену запускает её бутстрап (`IStartable`).
+## Конфиги
 
-## Конфиги (`Assets/_Project/Resources/Configs`)
-
-- `GameConfig` — стартовое золото.
-- `LevelsConfig` — список уровней (до 9); `Levels/LevelN` — попадания для победы, жизни, интервал появления кротов, время снаружи, золото за попадание.
-- `GameNavigationConfig` — имена сцен.
+В `Assets/_Project/Resources/Configs` находятся стартовое золото (`GameConfig`), имена сцен (`GameNavigationConfig`) и список уровней (`LevelsConfig`). В `Levels/LevelN` задаются строки и столбцы от 1 до 3, попадания для победы, жизни, интервал появления, время снаружи и золото за попадание. Уровень 1 использует поле 2×2, уровень 3 — 2×3, уровни 2, 4 и 5 — 3×3.
 
 ## Smart Merge и LFS на новой машине
 

@@ -8,6 +8,7 @@ namespace _Project.Develop.Runtime.App.MainMenu
         private readonly KeyboardInput _input;
         private readonly LevelSelector _levelSelector;
         private readonly MainMenuScreen _screen;
+        private bool _isEnabled;
 
         public MainMenuInput(KeyboardInput input, LevelSelector levelSelector, MainMenuScreen screen)
         {
@@ -16,9 +17,11 @@ namespace _Project.Develop.Runtime.App.MainMenu
             _screen = screen;
         }
 
+        public void Enable() => _isEnabled = true;
+
         public void Tick()
         {
-            if (_input.TryGetPressedNumber(out int number) == false)
+            if (_isEnabled == false || _input.TryGetPressedNumber(out int number) == false)
                 return;
 
             if (_levelSelector.Select(number) == LevelSelectResult.Locked)

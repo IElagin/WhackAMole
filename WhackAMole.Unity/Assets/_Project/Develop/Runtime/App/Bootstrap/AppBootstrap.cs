@@ -1,53 +1,49 @@
-using _Project.Develop.Runtime.App.Configs;
+using System.Threading;
 using _Project.Develop.Runtime.App.Navigation;
-using _Project.Develop.Runtime.Infrastructure.ConfigsService;
-using _Project.Develop.Runtime.Meta.Features.Economy;
+using _Project.Develop.Runtime.Infrastructure.Flow;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer.Unity;
 
 namespace _Project.Develop.Runtime.App.Bootstrap
 {
-    public sealed class AppBootstrap : IStartable
+    public sealed class AppBootstrap : IAsyncStartable
     {
+        private const string FLOW_NAME = "App startup";
         private const int TARGET_FRAME_RATE = 60;
 
-        private readonly ConfigsProviderService _configsProviderService;
-        private readonly WalletService _wallet;
+        private readonly FlowRunner _runner;
+        private readonly AppStartupSteps _startupSteps;
         private readonly GameNavigation _gameNavigation;
+        private readonly FlowProgressLog _progressLog;
 
         public AppBootstrap(
-            ConfigsProviderService configsProviderService,
-            WalletService wallet,
-            GameNavigation gameNavigation)
+            FlowRunner runner,
+            AppStartupSteps startupSteps,
+            GameNavigation gameNavigation,
+            FlowProgressLog progressLog)
         {
-            _configsProviderService = configsProviderService;
-            _wallet = wallet;
+            _runner = runner;
+            _startupSteps = startupSteps;
             _gameNavigation = gameNavigation;
+            _progressLog = progressLog;
         }
 
-        public void Start()
+        public async UniTask StartAsync(CancellationToken cancellationToken)
         {
             SetupApp();
 
-            _configsProviderService.Load();
-
-            GrantStartingGold();
+            await _runner.RunAsync(FLOW_NAME, _startupSteps.Build(), _progressLog, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
 
             _gameNavigation.OpenMainMenu();
         }
 
-        private void SetupApp()
+        private static void SetupApp()
         {
             Application.targetFrameRate = TARGET_FRAME_RATE;
             QualitySettings.vSyncCount = 0;
         }
 
-        private void GrantStartingGold()
-        {
-            int startingGold = _configsProviderService.GetConfig<GameConfig>().StartingGold;
-
-            if (startingGold > 0)
-                _wallet.Add(CurrencyId.Gold, startingGold);
-        }
     }
 }

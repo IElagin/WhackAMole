@@ -1,9 +1,19 @@
+using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using UnityEngine.SceneManagement;
+using VContainer;
+
 namespace _Project.Develop.Runtime.Infrastructure.SceneManagement
 {
     public interface ISceneLoader
     {
-        void Load(string sceneKey);
+        UniTask<Scene> LoadAsync(
+            string sceneKey,
+            CancellationToken cancellationToken,
+            Action<IContainerBuilder> extraRegistrations = null,
+            IProgress<float> progress = null);
 
-        void Load<TArgs>(string sceneKey, TArgs args);
+        UniTask UnloadAsync(Scene scene, CancellationToken cancellationToken);
     }
 }

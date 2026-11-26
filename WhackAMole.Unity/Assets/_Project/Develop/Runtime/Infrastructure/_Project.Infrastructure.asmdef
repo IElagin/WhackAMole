@@ -2,7 +2,8 @@
     "name": "_Project.Infrastructure",
     "rootNamespace": "_Project.Develop.Runtime.Infrastructure",
     "references": [
-        "VContainer"
+        "VContainer",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
