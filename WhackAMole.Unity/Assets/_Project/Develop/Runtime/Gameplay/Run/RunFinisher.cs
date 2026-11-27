@@ -1,4 +1,5 @@
 using _Project.Develop.Runtime.Gameplay.Levels;
+using _Project.Develop.Runtime.Gameplay.Moles;
 using _Project.Develop.Runtime.Meta.Features.Economy;
 using _Project.Develop.Runtime.Meta.Features.Progress;
 
@@ -10,21 +11,26 @@ namespace _Project.Develop.Runtime.Gameplay.Run
         private readonly PlayerProgressService _playerProgress;
         private readonly CurrentLevel _currentLevel;
         private readonly GameplayConsole _console;
+        private readonly MoleField _field;
 
         public RunFinisher(
             WalletService wallet,
             PlayerProgressService playerProgress,
             CurrentLevel currentLevel,
-            GameplayConsole console)
+            GameplayConsole console,
+            MoleField field)
         {
             _wallet = wallet;
             _playerProgress = playerProgress;
             _currentLevel = currentLevel;
             _console = console;
+            _field = field;
         }
 
         public void Win(int runGold)
         {
+            _field.HideAll();
+
             if (runGold > 0)
                 _wallet.Add(CurrencyId.Gold, runGold);
 
@@ -35,6 +41,8 @@ namespace _Project.Develop.Runtime.Gameplay.Run
 
         public void Lose(int runGold)
         {
+            _field.HideAll();
+
             _console.Defeat(runGold);
         }
     }

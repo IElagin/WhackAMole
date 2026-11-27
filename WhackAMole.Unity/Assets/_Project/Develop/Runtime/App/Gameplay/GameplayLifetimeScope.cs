@@ -28,9 +28,11 @@ namespace _Project.Develop.Runtime.App.Gameplay
             builder.Register<RunSession>(Lifetime.Singleton);
             builder.Register<RunFinisher>(Lifetime.Singleton);
 
-            builder.RegisterEntryPoint<MoleSpawner>();
-            builder.RegisterEntryPoint<WhackInput>();
-            builder.RegisterEntryPoint<RunEndInput>();
+            builder.Register<MoleSpawner>(Lifetime.Singleton);
+            builder.Register<WhackInput>(Lifetime.Singleton);
+            builder.Register<RunEndInput>(Lifetime.Singleton);
+            builder.Register<RunStatesFactory>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<GameplayRunLoop>().AsSelf();
         }
 
         private static void InstallStartupSteps(IContainerBuilder builder)

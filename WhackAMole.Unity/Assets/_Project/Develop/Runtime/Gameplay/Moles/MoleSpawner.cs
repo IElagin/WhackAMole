@@ -1,66 +1,47 @@
 using _Project.Develop.Runtime.Gameplay.Levels;
 using _Project.Develop.Runtime.Gameplay.Run;
-using UnityEngine;
-using VContainer.Unity;
 
 namespace _Project.Develop.Runtime.Gameplay.Moles
 {
-    public sealed class MoleSpawner : ITickable
+    public sealed class MoleSpawner
     {
         private readonly MoleField _moleField;
         private readonly RunSession _runSession;
         private readonly CurrentLevel _currentLevel;
+        private readonly GameplayConsole _console;
 
         private float _spawnTimer;
-        private bool _isFieldCleared;
 
-        public MoleSpawner(MoleField moleField, RunSession runSession, CurrentLevel currentLevel)
+        public MoleSpawner(MoleField moleField, RunSession runSession, CurrentLevel currentLevel, GameplayConsole console)
         {
             _moleField = moleField;
             _runSession = runSession;
             _currentLevel = currentLevel;
+            _console = console;
         }
 
-        public void Tick()
+        public void Tick(float deltaTime)
         {
-            if (_runSession.State == RunState.Won || _runSession.State == RunState.Lost)
-            {
-                ClearField();
-                return;
-            }
-
-            if (_runSession.State != RunState.Playing)
-                return;
-
-            int expiredCount = _moleField.TickTimers(Time.deltaTime);
+            int expiredCount = _moleField.TickTimers(deltaTime);
 
             for (int i = 0; i < expiredCount; i++)
             {
                 _runSession.LoseLife();
+                _console.LifeLost(_runSession.Lives);
 
-                if (_runSession.State != RunState.Playing)
-                {
-                    ClearField();
+                if (_runSession.HasLives == false)
                     return;
-                }
             }
 
-            _spawnTimer += Time.deltaTime;
+            _spawnTimer += deltaTime;
 
-            if (_spawnTimer < _currentLevel.Config.SpawnInterval)
+            LevelConfig config = _currentLevel.Config;
+
+            if (_spawnTimer < config.SpawnInterval)
                 return;
 
             _spawnTimer = 0f;
-            _moleField.TryShowInRandomFreeHole(_currentLevel.Config.VisibleDuration);
-        }
-
-        private void ClearField()
-        {
-            if (_isFieldCleared)
-                return;
-
-            _moleField.HideAll();
-            _isFieldCleared = true;
+            _moleField.TryShowInRandomFreeHole(config.VisibleDuration);
         }
     }
 }
