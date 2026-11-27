@@ -4,11 +4,13 @@ namespace _Project.Develop.Runtime.Gameplay.Run
     {
         private readonly RunSession _session;
         private readonly RunFinisher _finisher;
+        private readonly IRunEndControls _controls;
 
-        public LostRunState(RunSession session, RunFinisher finisher)
+        public LostRunState(RunSession session, RunFinisher finisher, IRunEndControls controls)
         {
             _session = session;
             _finisher = finisher;
+            _controls = controls;
         }
 
         public override void Enter()
@@ -16,6 +18,14 @@ namespace _Project.Develop.Runtime.Gameplay.Run
             base.Enter();
 
             _finisher.Lose(_session.Gold);
+            _controls.BindDefeat();
+        }
+
+        public override void Exit()
+        {
+            _controls.Clear();
+
+            base.Exit();
         }
     }
 }

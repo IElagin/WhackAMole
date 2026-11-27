@@ -9,21 +9,24 @@ namespace _Project.Develop.Runtime.Gameplay.Run
         private readonly RunSession _session;
         private readonly RunFinisher _finisher;
         private readonly GameplayConsole _console;
+        private readonly IRunEndControls _controls;
 
         public RunStatesFactory(
-            CurrentLevel currentLevel, RunSession session, RunFinisher finisher, GameplayConsole console)
+            CurrentLevel currentLevel, RunSession session, RunFinisher finisher, GameplayConsole console,
+            IRunEndControls controls)
         {
             _currentLevel = currentLevel;
             _session = session;
             _finisher = finisher;
             _console = console;
+            _controls = controls;
         }
 
         public RunStateMachine Create()
         {
             PlayingRunState playing = new(_currentLevel, _session, _console);
-            WonRunState won = new(_session, _finisher);
-            LostRunState lost = new(_session, _finisher);
+            WonRunState won = new(_session, _finisher, _controls);
+            LostRunState lost = new(_session, _finisher, _controls);
 
             RunStateMachine machine = new();
             machine.AddState(playing);

@@ -29,8 +29,9 @@ namespace _Project.Develop.Runtime.App.Gameplay
             builder.Register<RunFinisher>(Lifetime.Singleton);
 
             builder.Register<MoleSpawner>(Lifetime.Singleton);
+            builder.Register<WhackService>(Lifetime.Singleton);
             builder.Register<WhackInput>(Lifetime.Singleton);
-            builder.Register<RunEndInput>(Lifetime.Singleton);
+            builder.Register<RunEndInput>(Lifetime.Singleton).AsSelf().As<IRunEndControls>();
             builder.Register<RunStatesFactory>(Lifetime.Singleton);
             builder.RegisterEntryPoint<GameplayRunLoop>().AsSelf();
         }

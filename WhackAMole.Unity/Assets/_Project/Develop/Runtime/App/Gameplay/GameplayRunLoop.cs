@@ -56,7 +56,7 @@ namespace _Project.Develop.Runtime.App.Gameplay
 
             // The FSM checks transitions before UpdateLogic, so feed it this frame's results first.
             _machine.Update(deltaTime);
-            _runEndInput.Tick(CurrentState);
+            _runEndInput.Tick();
         }
 
         public void Dispose()
